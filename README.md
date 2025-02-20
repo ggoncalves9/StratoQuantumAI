@@ -1,4 +1,4 @@
-# StratoAI
+# Strato_Quantum_AI
 """
 
 🚀 **StratoAI** é um ecossistema de agentes de IA de código aberto para empresas. Ele integra diversas tecnologias para atuar dentro de uma organização, analisando dados e otimizando operações.
