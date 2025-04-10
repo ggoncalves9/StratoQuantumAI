@@ -42,3 +42,7 @@ O **StratoAI** visa fornecer um **ambiente inteligente e interconectado** para e
 
 Este projeto é open-source, licenciado sob a **MIT License**.
 """
+
+![StratoQuantum](https://github.com/user-attachments/assets/13cbe5cf-063e-4325-b1d4-451e91a2708c)
+
+
