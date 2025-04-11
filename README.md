@@ -1,5 +1,3 @@
-# Strato_Quantum_AI
-
 ![ChatGPT Image 11 de abr  de 2025, 12_09_07](https://github.com/user-attachments/assets/59bc6302-cf1c-441b-ab5a-02d2ff56c85f)
 
 """
