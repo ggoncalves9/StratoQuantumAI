@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PAC.index – Platform Agents Constellation (v1.0.0)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* =========================================================
+       PAC.index – SINGLE FILE MVP (prepared for modular split)
+       Blocks: VerticalAI (AGT), SaaS shell (PRF), SBL, SBR, CTR
+       Themes: Solarpunk, Neo-Futurismo, Sci‑Fi Modern, Glass, Futurismo Minimalista
+       ========================================================= */
+
+    :root{
+      /* Default (will be overridden by theme class) */
+      --bg: #0a0c10;
+      --card: #11141a;
+      --text: #dfe7f5;
+      --muted: #93a0b5;
+      --primary: #00e6ff; /* ciano */
+      --accent: #7b61ff;
+      --ring: rgba(0,230,255,.35);
+      --glass: rgba(255,255,255,.06);
+      --shadow: rgba(0,0,0,.35);
+      --radius: 16px;
+    }
+
+    /* ===== THEMES (body classes) ===== */
+    body.theme-solarpunk{ --bg:#0b120b; --card:#101a10; --text:#e6ffe6; --muted:#9bb79b; --primary:#8cff00; --accent:#00e6a8; --ring:rgba(140,255,0,.35); --glass:rgba(140,255,0,.06);} 
+    body.theme-neo{        --bg:#070a0d; --card:#0e1218; --text:#e9f0ff; --muted:#9fb2cc; --primary:#00e6ff; --accent:#7b61ff; --ring:rgba(0,230,255,.35); --glass:rgba(123,97,255,.08);} 
+    body.theme-scifi{      --bg:#0a0a12; --card:#121224; --text:#e8e8ff; --muted:#a5a5c7; --primary:#6df3ff; --accent:#ff6df3; --ring:rgba(109,243,255,.35); --glass:rgba(255,109,243,.08);} 
+    body.theme-glass{      --bg:#0b0f14; --card:rgba(255,255,255,.06); --text:#f4fbff; --muted:#b7c6d8; --primary:#9fe8ff; --accent:#ffffff; --ring:rgba(159,232,255,.35); --glass:rgba(255,255,255,.12); backdrop-filter: blur(8px);} 
+    body.theme-clean{      --bg:#0a0b0c; --card:#101214; --text:#e8f0f7; --muted:#a9b6c4; --primary:#00d0ff; --accent:#00ffaa; --ring:rgba(0,208,255,.30); --glass:rgba(255,255,255,.05);} 
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      display:grid; grid-template-rows: auto 1fr auto;
+    }
+
+    /* ===== Top bar with theme dots ===== */
+    .topbar{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:10px 16px; border-bottom:1px solid var(--ring); background:linear-gradient(0deg, transparent, rgba(255,255,255,.03));}
+    .brand{display:flex; align-items:center; gap:12px; font-family: Orbitron, sans-serif; font-weight:700; letter-spacing:.08em}
+    .brand-mark{width:28px; height:28px; border-radius:8px; background:radial-gradient(120% 120% at 30% 30%, var(--primary), transparent); box-shadow:0 0 0 1px var(--ring), 0 6px 16px var(--shadow)}
+    .theme-dots{display:flex; gap:8px}
+    .dot{width:14px; height:14px; border-radius:999px; border:1px solid rgba(255,255,255,.25); cursor:pointer; box-shadow:0 2px 8px var(--shadow)}
+    .dot[data-theme="solarpunk"]{background:linear-gradient(135deg,#9cff00,#00e6a8)}
+    .dot[data-theme="neo"]{background:linear-gradient(135deg,#00e6ff,#7b61ff)}
+    .dot[data-theme="scifi"]{background:linear-gradient(135deg,#6df3ff,#ff6df3)}
+    .dot[data-theme="glass"]{background:linear-gradient(135deg,#ffffff,#9fe8ff)}
+    .dot[data-theme="clean"]{background:linear-gradient(135deg,#00d0ff,#00ffaa)}
+
+    /* ===== Main layout (SBL | CTR | SBR) ===== */
+    .wrap{display:grid; grid-template-columns: 260px 1fr 300px; gap:16px; padding:16px;}
+    .card{background:var(--card); border:1px solid var(--ring); border-radius:var(--radius); box-shadow:0 8px 28px var(--shadow)}
+
+    /* ===== Sidebar Left (SBL) ===== */
+    .sbl{position:relative; overflow:hidden}
+    .sbl::before{content:""; position:absolute; top:0; right:-40px; bottom:0; width:80px; border-radius:50%; background:radial-gradient(closest-side, rgba(255,255,255,.06), transparent); opacity:.5; pointer-events:none}
+    .sbl-head{display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid var(--ring)}
+    .sbl-title{font-family:Orbitron, sans-serif; font-weight:600}
+    .sbl-collapse{width:34px; height:34px; border-radius:8px; background:var(--glass); border:1px solid var(--ring); cursor:pointer}
+    .sbl-body{padding:10px 10px 16px;}
+    .menu{display:flex; flex-direction:column; gap:10px}
+    .menu-group{border:1px dashed var(--ring); border-radius:12px; overflow:hidden}
+    .menu-h{padding:10px 12px; font-weight:600; display:flex; align-items:center; justify-content:space-between; cursor:pointer; background:linear-gradient(180deg, rgba(255,255,255,.03), transparent)}
+    .menu-list{padding:8px 12px; display:grid; gap:6px}
+    .menu-item{padding:8px 10px; border-radius:8px; background:var(--glass); border:1px solid transparent; cursor:pointer}
+    .menu-item:hover{border-color:var(--ring)}
+
+    /* ===== Sidebar Right (SBR) – internal chat placeholder ===== */
+    .sbr{display:flex; flex-direction:column}
+    .sbr-head{padding:12px 14px; border-bottom:1px solid var(--ring); display:flex; align-items:center; justify-content:space-between}
+    .sbr-body{flex:1; display:flex; flex-direction:column; gap:10px; padding:12px}
+    .pill{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; background:var(--glass); border:1px solid var(--ring)}
+    .thread{flex:1; overflow:auto; display:flex; flex-direction:column; gap:8px}
+    .msg{max-width:85%; padding:8px 12px; border-radius:12px; background:var(--glass); border:1px solid var(--ring)}
+    .msg.me{align-self:flex-end; background:linear-gradient(135deg, var(--primary), transparent); color:#001018}
+
+    /* ===== Central (CTR) ===== */
+    .ctr{position:relative; overflow:hidden}
+    .ctr-tabs{position:absolute; top:10px; right:10px; display:flex; gap:6px; z-index:3}
+    .ctr-tab{width:10px; height:10px; border-radius:999px; border:1px solid rgba(255,255,255,.45); cursor:pointer; opacity:.8}
+    .ctr-tab[data-theme="solarpunk"]{background:#9cff00}
+    .ctr-tab[data-theme="neo"]{background:#00e6ff}
+    .ctr-tab[data-theme="scifi"]{background:#6df3ff}
+    .ctr-tab[data-theme="glass"]{background:#ffffff}
+    .ctr-tab[data-theme="clean"]{background:#00d0ff}
+
+    .ctr-head{padding:12px 14px; border-bottom:1px solid var(--ring); display:flex; align-items:center; justify-content:space-between}
+    .ctr-title{font-weight:600}
+    .ctr-body{position:relative; height:calc(100% - 52px)}
+    .page-host{position:absolute; inset:12px; border-radius:12px; overflow:hidden; border:1px solid var(--ring); background:radial-gradient(120% 120% at 10% 10%, rgba(255,255,255,.04), transparent)}
+    .page-host iframe{position:absolute; inset:0; width:100%; height:100%; border:0; background:transparent}
+    .page-surface{position:absolute; inset:0; padding:16px; overflow:auto}
+
+    /* ===== VerticalAI – Toolbar bottom ===== */
+    .agt-toolbar{position:fixed; left:50%; bottom:20px; transform:translateX(-50%); z-index:40}
+    .agt-tray{display:flex; align-items:flex-end; gap:14px; padding:12px 16px; border-radius:999px; background:rgba(0,0,0,.25); border:1px solid var(--ring); box-shadow:0 8px 28px var(--shadow)}
+    .agt-item{display:flex; flex-direction:column; align-items:center; gap:6px}
+    .agt-btn{width:48px; height:48px; border-radius:999px; display:grid; place-items:center; cursor:pointer; border:1px solid rgba(255,255,255,.2); background: radial-gradient(120% 120% at 30% 30%, var(--primary), rgba(0,0,0,.4)); box-shadow: inset 0 0 10px rgba(255,255,255,.08)}
+    .agt-label{font-size:.72rem; letter-spacing:.04em; opacity:.9}
+
+    /* ===== Agent Popup (mock phone 16:9) ===== */
+    .popup-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:50}
+    .popup{width:360px; aspect-ratio:9/16; border-radius:24px; background:var(--card); border:1px solid var(--ring); box-shadow:0 20px 48px var(--shadow); display:flex; flex-direction:column; overflow:hidden}
+    .popup.lg{width:420px}
+    .popup.xl{width:520px}
+    .pop-head{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 12px; border-bottom:1px solid var(--ring)}
+    .pop-title{font-weight:600; font-family:Orbitron, sans-serif}
+    .pop-actions{display:flex; gap:6px}
+    .ghost{background:var(--glass); border:1px solid var(--ring); color:var(--text); border-radius:10px; padding:6px 8px; cursor:pointer}
+    .pop-body{flex:1; display:flex; flex-direction:column; gap:8px; padding:12px}
+    .input{display:flex; gap:8px}
+    .input input{flex:1; padding:10px 12px; border-radius:10px; border:1px solid var(--ring); background:var(--glass); color:var(--text)}
+    .input button{padding:10px 12px; border-radius:10px; border:1px solid var(--ring); background:var(--primary); color:#00151a; font-weight:600; cursor:pointer}
+
+    /* ===== Footer ===== */
+    .foot{padding:10px 16px; border-top:1px solid var(--ring); display:flex; align-items:center; justify-content:center; opacity:.8}
+
+    /* ===== Responsive ===== */
+    @media (max-width: 1080px){ .wrap{grid-template-columns: 220px 1fr 0px;} .sbr{display:none} }
+    @media (max-width: 760px){ .wrap{grid-template-columns: 1fr;} .sbl{display:none} }
+  </style>
+</head>
+<body class="theme-neo">
+  <!-- ===== Topbar with theme dots ===== -->
+  <div class="topbar">
+    <div class="brand"><div class="brand-mark"></div><div>AGENTS CONSTELLATION</div></div>
+    <div class="theme-dots" id="themeDots" title="Trocar tema">
+      <div class="dot" data-theme="solarpunk" aria-label="Solarpunk"></div>
+      <div class="dot" data-theme="neo" aria-label="Neo-Futurismo"></div>
+      <div class="dot" data-theme="scifi" aria-label="Sci‑Fi Modern"></div>
+      <div class="dot" data-theme="glass" aria-label="Glassmorphism"></div>
+      <div class="dot" data-theme="clean" aria-label="Futurismo Minimalista"></div>
+    </div>
+  </div>
+
+  <!-- ===== Main 3-column layout ===== -->
+  <div class="wrap">
+    <!-- ==== SBL – Sidebar Left (collapsible with concavity) ==== -->
+    <aside class="sbl card" id="sbl">
+      <div class="sbl-head">
+        <div class="sbl-title">Menu</div>
+        <button class="sbl-collapse" id="sblToggle" title="Recolher/Expandir"></button>
+      </div>
+      <div class="sbl-body">
+        <nav class="menu" id="menuSectors"><!-- filled by JS --></nav>
+      </div>
+    </aside>
+
+    <!-- ==== CTR – Central workspace (internal/external pages) ==== -->
+    <main class="ctr card">
+      <div class="ctr-head">
+        <div class="ctr-title">Workspace</div>
+        <div class="pill">CTR-V1.0.0</div>
+      </div>
+      <div class="ctr-body">
+        <div class="ctr-tabs" id="ctrThemeTabs">
+          <div class="ctr-tab" data-theme="solarpunk"></div>
+          <div class="ctr-tab" data-theme="neo"></div>
+          <div class="ctr-tab" data-theme="scifi"></div>
+          <div class="ctr-tab" data-theme="glass"></div>
+          <div class="ctr-tab" data-theme="clean"></div>
+        </div>
+        <div class="page-host" id="pageHost">
+          <!-- internal page surface (default) -->
+          <section class="page-surface" id="surface">
+            <h2 style="margin-top:0">PAC.index – Bem-vindo 👋</h2>
+            <p>Carregue uma página interna (ex.: <code>index2.html</code>) ou um sistema externo em modo full-screen sandboxed.</p>
+            <div style="display:flex; gap:8px; margin-top:10px">
+              <button class="ghost" id="loadInternal">Carregar index2.html</button>
+              <button class="ghost" id="loadExternal">Carregar página externa</button>
+              <button class="ghost" id="unload">Fechar</button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <!-- ==== SBR – Sidebar Right (internal chat placeholder) ==== -->
+    <aside class="sbr card">
+      <div class="sbr-head">
+        <div>Contatos internos</div>
+        <div class="pill">SBR‑V1.0.0</div>
+      </div>
+      <div class="sbr-body">
+        <div class="thread" id="miniThread">
+          <div class="msg">Canal interno para testes (SBR).</div>
+          <div class="msg me">Cópia mínima de chat para futura integração.</div>
+        </div>
+        <div class="input">
+          <input id="miniInput" placeholder="Enviar mensagem interna..."/>
+          <button id="miniSend">Enviar</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ==== VerticalAI – Agents Toolbar (AGT) ==== -->
+  <div class="agt-toolbar" role="region" aria-label="Toolbar de Agentes">
+    <div class="agt-tray" id="agtTray">
+      <!-- Right to left order requested -->
+      <div class="agt-item"><div class="agt-btn" data-agent="financeiro">F</div><div class="agt-label">Financeiro</div></div>
+      <div class="agt-item"><div class="agt-btn" data-agent="rh">RH</div><div class="agt-label">Rec. Humanos</div></div>
+      <div class="agt-item"><div class="agt-btn" data-agent="tecinov">T&I</div><div class="agt-label">Tecnologia</div></div>
+      <div class="agt-item"><div class="agt-btn" data-agent="operacoes">OP</div><div class="agt-label">Operações</div></div>
+      <div class="agt-item"><div class="agt-btn" data-agent="comercial">C</div><div class="agt-label">Comercial</div></div>
+      <div class="agt-item"><div class="agt-btn" data-agent="produto2">P2</div><div class="agt-label">Produto</div></div>
+      <div class="agt-item"><div class="agt-btn" data-agent="produto1">P1</div><div class="agt-label">Produto</div></div>
+      <div class="agt-item"><div class="agt-btn" data-agent="marketing">M</div><div class="agt-label">Marketing</div></div>
+    </div>
+  </div>
+
+  <!-- ==== Agent Popup (mock phone) ==== -->
+  <div class="popup-backdrop" id="popup">
+    <div class="popup" id="popupCard" role="dialog" aria-modal="true" aria-label="Chat do agente">
+      <div class="pop-head">
+        <div class="pop-title" id="popTitle">Agente</div>
+        <div class="pop-actions">
+          <button class="ghost" data-size="sm" title="Pequeno">S</button>
+          <button class="ghost" data-size="lg" title="Médio" >M</button>
+          <button class="ghost" data-size="xl" title="Grande">L</button>
+          <button class="ghost" id="closePop" title="Fechar">✕</button>
+        </div>
+      </div>
+      <div class="pop-body">
+        <div class="thread" id="agentThread"></div>
+        <div class="input">
+          <input id="agentInput" placeholder="Pergunte algo ao agente..." />
+          <button id="agentSend">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="foot">PAC.index v1.0.0 • preparado para modularização (V3.x → microserviços)</footer>
+
+  <script>
+    // =========================================================
+    // PAC.index – JS (single-file). Ready for split:
+    // verticalai.js, sbl.js, sbr.js, ctr.js, theme.js, storage.js
+    // =========================================================
+
+    // ===== Utilities =====
+    const store = {
+      get(k, d=null){ try{ return JSON.parse(localStorage.getItem(k)) ?? d }catch{ return d } },
+      set(k, v){ localStorage.setItem(k, JSON.stringify(v)) }
+    }
+
+    // ===== Theme handling (top dots + CTR dots + persist) =====
+    const THEME_KEY = 'pac_theme';
+    const applyTheme = (t)=>{ document.body.className = 'theme-'+(t||'neo'); store.set(THEME_KEY, t) }
+    ;(()=>{ applyTheme(store.get(THEME_KEY, 'neo')) })();
+    document.getElementById('themeDots').addEventListener('click', (e)=>{
+      const dot = e.target.closest('.dot'); if(!dot) return; applyTheme(dot.dataset.theme)
+    });
+    document.getElementById('ctrThemeTabs').addEventListener('click', (e)=>{
+      const t = e.target.getAttribute('data-theme'); if(!t) return; applyTheme(t)
+    });
+
+    // ===== SBL – dynamic menu data with subitems =====
+    const SECTORS = [
+      { key:'marketing', title:'Marketing', items:['Campanhas','SEO/Conteúdo','Mídia Paga','Calendário','Relatórios'] },
+      { key:'produto1', title:'Produto/Serviço', items:['Roadmap','Feedbacks','Docs Funcionais','Prototipagem'] },
+      { key:'produto2', title:'Produto/Serviço', items:['Catálogo','KPIs de Uso','Backlog','Lançamentos'] },
+      { key:'comercial', title:'Comercial', items:['Leads','Oportunidades','Propostas','Funil','Relatórios'] },
+      { key:'operacoes', title:'Operações', items:['SLA/Incidentes','Runbooks','Projetos','Inventário','Relatórios'] },
+      { key:'tecinov', title:'Tecnologia e Inovação', items:['Arquitetura','CI/CD','Observabilidade','P&D','Segurança'] },
+      { key:'rh', title:'Recursos Humanos', items:['Vagas','Onboarding','Políticas','Treinamentos','Avaliações'] },
+      { key:'financeiro', title:'Financeiro', items:['Contas','Faturamento','Forecast','Custos','Relatórios'] }
+    ];
+
+    const menuSectors = document.getElementById('menuSectors');
+    SECTORS.forEach(sec=>{
+      const g = document.createElement('div'); g.className='menu-group';
+      g.innerHTML = `
+        <div class="menu-h" data-key="${sec.key}">
+          <span>${sec.title}</span>
+          <span>▾</span>
+        </div>
+        <div class="menu-list" hidden>
+          ${sec.items.map(i=>`<div class="menu-item" data-sec="${sec.key}">${i}</div>`).join('')}
+        </div>
+      `;
+      menuSectors.appendChild(g);
+    });
+
+    // Toggle group
+    menuSectors.addEventListener('click', (e)=>{
+      const h = e.target.closest('.menu-h'); if(!h) return;
+      const list = h.nextElementSibling; list.hidden = !list.hidden;
+    });
+
+    // Load stub pages from CTR when clicking a menu item
+    menuSectors.addEventListener('click', (e)=>{
+      const it = e.target.closest('.menu-item'); if(!it) return;
+      loadSurface(`<h3 style="margin-top:0">${it.dataset.sec.toUpperCase()} — ${it.textContent}</h3><p>Em breve: conteúdo/relatórios desta seção.</p>`)
+    });
+
+    // Collapse SBL
+    const sbl = document.getElementById('sbl');
+    document.getElementById('sblToggle').addEventListener('click', ()=>{
+      sbl.style.width = sbl.style.width ? '' : '64px';
+      sbl.querySelector('.sbl-body').style.display = sbl.style.width ? 'none' : '';
+    });
+
+    // ===== SBR – tiny internal chat mock =====
+    const miniThread = document.getElementById('miniThread');
+    document.getElementById('miniSend').addEventListener('click', ()=>{
+      const inp = document.getElementById('miniInput');
+      if(!inp.value.trim()) return; const m = document.createElement('div'); m.className='msg me'; m.textContent=inp.value; miniThread.appendChild(m); miniThread.scrollTop = miniThread.scrollHeight; inp.value='';
+    });
+
+    // ===== CTR – load internal/external pages =====
+    const host = document.getElementById('pageHost');
+    const surface = document.getElementById('surface');
+
+    function unload(){ host.innerHTML = ''; host.appendChild(surface); }
+    function loadSurface(html){ surface.innerHTML = html; unload(); }
+
+    async function loadInternal(){
+      try{ const res = await fetch('index2.html'); const html = await res.text(); host.innerHTML = `<iframe sandbox="allow-same-origin allow-scripts allow-forms" srcdoc="${html.replace(/"/g,'&quot;')}"></iframe>` }
+      catch{ loadSurface('<p>index2.html não encontrado. Crie o arquivo na raiz do projeto.</p>') }
+    }
+    function loadExternal(){
+      const url = prompt('URL externa para carregar (https://...)');
+      if(!url) return; host.innerHTML = `<iframe sandbox="allow-same-origin allow-scripts allow-forms allow-popups" src="${url}"></iframe>`
+    }
+
+    document.getElementById('loadInternal').onclick = loadInternal;
+    document.getElementById('loadExternal').onclick = loadExternal;
+    document.getElementById('unload').onclick = unload;
+
+    // ===== AGT – popup chat with size presets (S, M, L) + history per agent =====
+    const popup = document.getElementById('popup');
+    const popCard = document.getElementById('popupCard');
+    const popTitle = document.getElementById('popTitle');
+    const agentThread = document.getElementById('agentThread');
+    const agentInput = document.getElementById('agentInput');
+
+    let currentAgent = null;
+
+    function openAgent(key, title){
+      currentAgent = key; popTitle.textContent = title; agentThread.innerHTML='';
+      const hist = store.get('hist_'+key, []); hist.forEach(x=> addMsg(x.text, x.me));
+      popup.style.display='flex';
+    }
+    function closeAgent(){ popup.style.display='none'; currentAgent=null }
+    function addMsg(text, me=false){
+      const d = document.createElement('div'); d.className='msg'+(me?' me':''); d.textContent=text; agentThread.appendChild(d); agentThread.scrollTop = agentThread.scrollHeight;
+    }
+
+    document.getElementById('agtTray').addEventListener('click', (e)=>{
+      const b = e.target.closest('.agt-btn'); if(!b) return;
+      const key = b.dataset.agent; const sec = SECTORS.find(s=>s.key===key) || {title:key};
+      openAgent(key, sec.title || key);
+    });
+
+    document.getElementById('closePop').onclick = closeAgent;
+
+    // Size buttons
+    document.querySelectorAll('.pop-actions [data-size]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        popCard.classList.remove('lg','xl');
+        if(btn.dataset.size==='lg') popCard.classList.add('lg');
+        if(btn.dataset.size==='xl') popCard.classList.add('xl');
+        store.set('popup_size', btn.dataset.size);
+      })
+    });
+    // restore popup size
+    (function(){ const s = store.get('popup_size','lg'); document.querySelector(`.pop-actions [data-size="${s}"]`)?.click() })();
+
+    // Send message (MVP: local echo + save in localStorage)
+    document.getElementById('agentSend').addEventListener('click', ()=>{
+      if(!currentAgent) return; const t = agentInput.value.trim(); if(!t) return;
+      addMsg(t, true); agentInput.value='';
+      // fake agent reply
+      setTimeout(()=> addMsg('Agente '+currentAgent+': recebida sua mensagem.'), 300);
+      // persist
+      const hist = store.get('hist_'+currentAgent, []); hist.push({text:t, me:true}); store.set('hist_'+currentAgent, hist);
+    });
+
+    // Close popup by backdrop
+    popup.addEventListener('click', (e)=>{ if(e.target===popup) closeAgent() });
+  </script>
+</body>
+</html>

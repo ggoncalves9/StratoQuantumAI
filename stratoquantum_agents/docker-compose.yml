@@ -1,0 +1,258 @@
+version: '3.8'
+
+services:
+  # AI Agents Core Service
+  agents-core:
+    build:
+      context: .
+      target: production
+    container_name: strato-quantum-agents-core
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - DATABASE_URL=postgresql://stratoquantum:stratoquantum2025@postgres:5432/stratoquantum
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=${SECRET_KEY:-agents-secret-key-change-in-production}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LOG_LEVEL=INFO
+      - WORKERS=4
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - agents-network
+    restart: unless-stopped
+    volumes:
+      - agents-logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Development version
+  agents-dev:
+    build:
+      context: .
+      target: development
+    container_name: strato-quantum-agents-dev
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - DATABASE_URL=postgresql://stratoquantum:stratoquantum2025@postgres:5432/stratoquantum
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=dev-agents-secret-key
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LOG_LEVEL=DEBUG
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - agents-network
+    volumes:
+      - .:/app
+      - /app/__pycache__
+    profiles:
+      - development
+
+  # PostgreSQL Database (shared with main platform)
+  postgres:
+    image: postgres:15-alpine
+    container_name: strato-quantum-agents-postgres
+    ports:
+      - "5433:5432"  # Different port to avoid conflicts
+    environment:
+      - POSTGRES_DB=stratoquantum
+      - POSTGRES_USER=stratoquantum
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-stratoquantum2025}
+    volumes:
+      - agents-postgres-data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - agents-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stratoquantum -d stratoquantum"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache (shared with main platform)
+  redis:
+    image: redis:7.2-alpine
+    container_name: strato-quantum-agents-redis
+    ports:
+      - "6380:6379"  # Different port to avoid conflicts
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-stratoquantum2025}
+    volumes:
+      - agents-redis-data:/data
+    networks:
+      - agents-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 3s
+      retries: 5
+
+  # Individual Agent Services (for microservices architecture)
+  
+  # Financial Agent
+  agent-financeiro:
+    build:
+      context: .
+      target: production
+    container_name: strato-quantum-agent-financeiro
+    ports:
+      - "8001:8000"
+    environment:
+      - ENVIRONMENT=production
+      - AGENT_ID=financeiro
+      - AGENT_PORT=8000
+      - DATABASE_URL=postgresql://stratoquantum:stratoquantum2025@postgres:5432/stratoquantum
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=${SECRET_KEY:-agents-secret-key}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - agents-network
+    restart: unless-stopped
+    profiles:
+      - microservices
+
+  # HR Agent
+  agent-rh:
+    build:
+      context: .
+      target: production
+    container_name: strato-quantum-agent-rh
+    ports:
+      - "8002:8000"
+    environment:
+      - ENVIRONMENT=production
+      - AGENT_ID=rh
+      - AGENT_PORT=8000
+      - DATABASE_URL=postgresql://stratoquantum:stratoquantum2025@postgres:5432/stratoquantum
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=${SECRET_KEY:-agents-secret-key}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - agents-network
+    restart: unless-stopped
+    profiles:
+      - microservices
+
+  # Technology Agent
+  agent-tecnologia:
+    build:
+      context: .
+      target: production
+    container_name: strato-quantum-agent-tecnologia
+    ports:
+      - "8003:8000"
+    environment:
+      - ENVIRONMENT=production
+      - AGENT_ID=tecnologia
+      - AGENT_PORT=8000
+      - DATABASE_URL=postgresql://stratoquantum:stratoquantum2025@postgres:5432/stratoquantum
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=${SECRET_KEY:-agents-secret-key}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - agents-network
+    restart: unless-stopped
+    profiles:
+      - microservices
+
+  # Load Balancer for Agents (HAProxy)
+  agents-lb:
+    image: haproxy:2.8-alpine
+    container_name: strato-quantum-agents-lb
+    ports:
+      - "8080:80"
+      - "8404:8404"  # Stats page
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      - agents-core
+    networks:
+      - agents-network
+    restart: unless-stopped
+    profiles:
+      - production
+      - microservices
+
+  # Monitoring - Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: strato-quantum-agents-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - agents-prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - agents-network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # Monitoring - Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: strato-quantum-agents-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - agents-grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus
+    networks:
+      - agents-network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+networks:
+  agents-network:
+    driver: bridge
+    name: strato-quantum-agents-network
+
+volumes:
+  agents-postgres-data:
+    name: strato-quantum-agents-postgres-data
+  agents-redis-data:
+    name: strato-quantum-agents-redis-data
+  agents-logs:
+    name: strato-quantum-agents-logs
+  agents-prometheus-data:
+    name: strato-quantum-agents-prometheus-data
+  agents-grafana-data:
+    name: strato-quantum-agents-grafana-data

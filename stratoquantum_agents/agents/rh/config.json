@@ -1,0 +1,74 @@
+{
+  "agent": {
+    "id": "rh",
+    "name": "Agente RH",
+    "version": "2.6.3",
+    "description": "Especialista em gestão de pessoas, recrutamento e desenvolvimento",
+    "workspace": "rh"
+  },
+  "bedrock": {
+    "runtime_version": "1.0",
+    "model_id": "anthropic.claude-3-sonnet-20240229-v1:0",
+    "region": "us-east-1",
+    "max_tokens": 4000,
+    "temperature": 0.2
+  },
+  "capabilities": [
+    "recruitment_analysis",
+    "performance_analysis",
+    "culture_analysis", 
+    "training_analysis"
+  ],
+  "tools": [
+    {
+      "name": "recruitment_analyzer",
+      "description": "Analisa processos de recrutamento e fornece insights sobre contratações",
+      "parameters": {
+        "position": {
+          "type": "string",
+          "description": "Posição para análise (all ou cargo específico)",
+          "default": "all"
+        }
+      }
+    },
+    {
+      "name": "performance_analyzer",
+      "description": "Analisa performance e engajamento dos colaboradores",
+      "parameters": {
+        "period": {
+          "type": "string",
+          "description": "Período de análise (quarterly, yearly)",
+          "default": "quarterly"
+        }
+      }
+    },
+    {
+      "name": "culture_analyzer",
+      "description": "Analisa cultura organizacional e clima da empresa",
+      "parameters": {}
+    },
+    {
+      "name": "training_analyzer",
+      "description": "Analisa programas de treinamento e desenvolvimento",
+      "parameters": {
+        "department": {
+          "type": "string",
+          "description": "Departamento para análise (all ou departamento específico)",
+          "default": "all"
+        }
+      }
+    }
+  ],
+  "runtime": {
+    "port": 8080,
+    "timeout": 30,
+    "memory_limit": "512Mi",
+    "cpu_limit": "0.5",
+    "log_level": "INFO"
+  },
+  "aws": {
+    "ecr_repository": "stratoquantum/agent-rh",
+    "task_role_arn": "arn:aws:iam::ACCOUNT_ID:role/StratoQuantumAgentRHRole",
+    "execution_role_arn": "arn:aws:iam::ACCOUNT_ID:role/StratoQuantumAgentExecutionRole"
+  }
+}

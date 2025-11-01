@@ -1,0 +1,41 @@
+{
+  "agent": {
+    "id": "comercial",
+    "name": "Agente Comercial",
+    "version": "2.6.3",
+    "description": "Especialista em vendas, CRM e pipeline",
+    "workspace": "comercial"
+  },
+  "bedrock": {
+    "runtime_version": "1.0",
+    "model_id": "anthropic.claude-3-sonnet-20240229-v1:0",
+    "region": "us-east-1",
+    "max_tokens": 4000,
+    "temperature": 0.2
+  },
+  "capabilities": ["lead_qualification", "sales_forecast", "pipeline_analysis", "conversion_optimization"],
+  "tools": [
+    {
+      "name": "comercial_analyzer",
+      "description": "Ferramenta principal de análise para Comercial",
+      "parameters": {
+        "query": {
+          "type": "string",
+          "description": "Consulta ou solicitação para análise"
+        }
+      }
+    }
+  ],
+  "runtime": {
+    "port": 8080,
+    "timeout": 30,
+    "memory_limit": "512Mi",
+    "cpu_limit": "0.5",
+    "log_level": "INFO"
+  },
+  "aws": {
+    "ecr_repository": "stratoquantum/agent-comercial",
+    "task_role_arn": "arn:aws:iam::ACCOUNT_ID:role/StratoQuantumAgentComercialRole",
+    "execution_role_arn": "arn:aws:iam::ACCOUNT_ID:role/StratoQuantumAgentExecutionRole"
+  }
+}

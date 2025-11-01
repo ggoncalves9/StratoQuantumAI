@@ -1,0 +1,88 @@
+{
+  "agent": {
+    "id": "financeiro",
+    "name": "Agente Financeiro",
+    "version": "2.6.3",
+    "description": "Especialista em análise financeira, fluxo de caixa e previsões",
+    "workspace": "financeiro"
+  },
+  "bedrock": {
+    "runtime_version": "1.0",
+    "model_id": "anthropic.claude-3-sonnet-20240229-v1:0",
+    "region": "us-east-1",
+    "max_tokens": 4000,
+    "temperature": 0.1
+  },
+  "capabilities": [
+    "cash_flow_analysis",
+    "budget_analysis", 
+    "roi_calculation",
+    "financial_forecast"
+  ],
+  "tools": [
+    {
+      "name": "cash_flow_analyzer",
+      "description": "Analisa fluxo de caixa e fornece insights financeiros",
+      "parameters": {
+        "period": {
+          "type": "string",
+          "description": "Período de análise (monthly, quarterly, yearly)",
+          "default": "monthly"
+        }
+      }
+    },
+    {
+      "name": "budget_analyzer", 
+      "description": "Analisa performance orçamentária por departamento",
+      "parameters": {
+        "department": {
+          "type": "string",
+          "description": "Departamento para análise (all, marketing, tecnologia, etc)",
+          "default": "all"
+        }
+      }
+    },
+    {
+      "name": "roi_calculator",
+      "description": "Calcula ROI de investimentos e projetos",
+      "parameters": {
+        "investment": {
+          "type": "number",
+          "description": "Valor do investimento"
+        },
+        "return_value": {
+          "type": "number", 
+          "description": "Valor de retorno"
+        },
+        "period_months": {
+          "type": "integer",
+          "description": "Período em meses",
+          "default": 12
+        }
+      }
+    },
+    {
+      "name": "financial_forecast",
+      "description": "Gera projeções financeiras baseadas em tendências",
+      "parameters": {
+        "months": {
+          "type": "integer",
+          "description": "Número de meses para projeção",
+          "default": 6
+        }
+      }
+    }
+  ],
+  "runtime": {
+    "port": 8080,
+    "timeout": 30,
+    "memory_limit": "512Mi",
+    "cpu_limit": "0.5",
+    "log_level": "INFO"
+  },
+  "aws": {
+    "ecr_repository": "stratoquantum/agent-financeiro",
+    "task_role_arn": "arn:aws:iam::ACCOUNT_ID:role/StratoQuantumAgentFinanceiroRole",
+    "execution_role_arn": "arn:aws:iam::ACCOUNT_ID:role/StratoQuantumAgentExecutionRole"
+  }
+}

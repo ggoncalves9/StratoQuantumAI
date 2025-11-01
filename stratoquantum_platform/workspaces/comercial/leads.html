@@ -1,0 +1,190 @@
+<div class="space-y-6">
+  <div class="bg-dark-800/30 border border-quantum-400/20 rounded-xl p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-lg font-semibold">Gestão de Leads</h3>
+      <div class="flex space-x-2">
+        <button class="bg-dark-700 hover:bg-dark-600 text-white px-4 py-2 rounded-lg transition-colors">
+          Importar Leads
+        </button>
+        <button class="bg-quantum-500 hover:bg-quantum-600 text-white px-4 py-2 rounded-lg transition-colors">
+          Novo Lead
+        </button>
+      </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-gradient-to-br from-blue-500 to-cyan-500 p-4 rounded-lg text-white">
+        <div class="text-2xl font-bold">342</div>
+        <div class="text-sm opacity-90">Leads Ativos</div>
+      </div>
+      <div class="bg-dark-700/50 border border-quantum-400/20 p-4 rounded-lg">
+        <div class="text-2xl font-bold text-green-400">23%</div>
+        <div class="text-sm text-gray-400">Taxa Conversão</div>
+      </div>
+      <div class="bg-dark-700/50 border border-quantum-400/20 p-4 rounded-lg">
+        <div class="text-2xl font-bold text-quantum-400">R$ 2.3k</div>
+        <div class="text-sm text-gray-400">Ticket Médio</div>
+      </div>
+      <div class="bg-dark-700/50 border border-quantum-400/20 p-4 rounded-lg">
+        <div class="text-2xl font-bold text-yellow-400">7 dias</div>
+        <div class="text-sm text-gray-400">Tempo Médio</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex flex-wrap items-center gap-3 mb-6 p-4 bg-dark-700/30 rounded-lg">
+      <select class="bg-dark-800 border border-quantum-400/20 rounded-lg px-3 py-2 text-sm">
+        <option>Todos os Status</option>
+        <option>Novo</option>
+        <option>Qualificado</option>
+        <option>Proposta</option>
+        <option>Negociação</option>
+      </select>
+      <select class="bg-dark-800 border border-quantum-400/20 rounded-lg px-3 py-2 text-sm">
+        <option>Todas as Fontes</option>
+        <option>Website</option>
+        <option>LinkedIn</option>
+        <option>Google Ads</option>
+        <option>Indicação</option>
+      </select>
+      <input type="text" placeholder="Buscar leads..." 
+             class="bg-dark-800 border border-quantum-400/20 rounded-lg px-3 py-2 text-sm flex-1 min-w-[200px]">
+      <button class="bg-quantum-500 hover:bg-quantum-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+        Filtrar
+      </button>
+    </div>
+
+    <!-- Leads List -->
+    <div class="space-y-3">
+      <div class="bg-dark-700/30 border border-quantum-400/10 rounded-lg p-4 hover:border-quantum-400/30 transition-colors">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+              JS
+            </div>
+            <div>
+              <h4 class="font-medium">João Silva</h4>
+              <p class="text-sm text-gray-400">joao.silva@empresa.com</p>
+              <div class="flex items-center space-x-3 mt-1">
+                <span class="text-xs text-gray-500">TechCorp Ltda</span>
+                <span class="text-xs text-gray-500">•</span>
+                <span class="text-xs text-gray-500">LinkedIn</span>
+                <span class="text-xs text-gray-500">•</span>
+                <span class="text-xs text-gray-500">Há 2 dias</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center space-x-3">
+            <span class="px-3 py-1 text-xs bg-green-400/20 text-green-300 rounded-full">Qualificado</span>
+            <span class="text-sm font-medium text-quantum-400">R$ 15.000</span>
+            <div class="flex space-x-1">
+              <button class="text-quantum-400 hover:text-quantum-300 p-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                </svg>
+              </button>
+              <button class="text-gray-400 hover:text-white p-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-dark-700/30 border border-quantum-400/10 rounded-lg p-4 hover:border-quantum-400/30 transition-colors">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+              MS
+            </div>
+            <div>
+              <h4 class="font-medium">Maria Santos</h4>
+              <p class="text-sm text-gray-400">maria@startup.io</p>
+              <div class="flex items-center space-x-3 mt-1">
+                <span class="text-xs text-gray-500">Startup Innovation</span>
+                <span class="text-xs text-gray-500">•</span>
+                <span class="text-xs text-gray-500">Website</span>
+                <span class="text-xs text-gray-500">•</span>
+                <span class="text-xs text-gray-500">Há 1 hora</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center space-x-3">
+            <span class="px-3 py-1 text-xs bg-blue-400/20 text-blue-300 rounded-full">Novo</span>
+            <span class="text-sm font-medium text-gray-400">A qualificar</span>
+            <div class="flex space-x-1">
+              <button class="text-quantum-400 hover:text-quantum-300 p-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                </svg>
+              </button>
+              <button class="text-gray-400 hover:text-white p-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-dark-700/30 border border-quantum-400/10 rounded-lg p-4 hover:border-quantum-400/30 transition-colors">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-semibold">
+              CA
+            </div>
+            <div>
+              <h4 class="font-medium">Carlos Almeida</h4>
+              <p class="text-sm text-gray-400">carlos@megacorp.com.br</p>
+              <div class="flex items-center space-x-3 mt-1">
+                <span class="text-xs text-gray-500">MegaCorp Brasil</span>
+                <span class="text-xs text-gray-500">•</span>
+                <span class="text-xs text-gray-500">Indicação</span>
+                <span class="text-xs text-gray-500">•</span>
+                <span class="text-xs text-gray-500">Há 5 dias</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center space-x-3">
+            <span class="px-3 py-1 text-xs bg-yellow-400/20 text-yellow-300 rounded-full">Proposta</span>
+            <span class="text-sm font-medium text-quantum-400">R$ 45.000</span>
+            <div class="flex space-x-1">
+              <button class="text-quantum-400 hover:text-quantum-300 p-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                </svg>
+              </button>
+              <button class="text-gray-400 hover:text-white p-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex items-center justify-between mt-6 pt-4 border-t border-quantum-400/20">
+      <div class="text-sm text-gray-400">
+        Mostrando 1-10 de 342 leads
+      </div>
+      <div class="flex space-x-2">
+        <button class="px-3 py-2 text-sm bg-dark-700 hover:bg-dark-600 rounded-lg transition-colors">
+          Anterior
+        </button>
+        <button class="px-3 py-2 text-sm bg-quantum-500 text-white rounded-lg">1</button>
+        <button class="px-3 py-2 text-sm bg-dark-700 hover:bg-dark-600 rounded-lg transition-colors">2</button>
+        <button class="px-3 py-2 text-sm bg-dark-700 hover:bg-dark-600 rounded-lg transition-colors">3</button>
+        <button class="px-3 py-2 text-sm bg-dark-700 hover:bg-dark-600 rounded-lg transition-colors">
+          Próximo
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,53 @@
+{
+  "name": "strato-quantum-platform",
+  "version": "2.6.0",
+  "description": "Strato Quantum Platform - Modern Business Management with AI Agents",
+  "main": "backend/src/server.js",
+  "scripts": {
+    "start": "cd backend && npm start",
+    "dev": "cd backend && npm run dev",
+    "install:backend": "cd backend && npm install",
+    "install:all": "npm run install:backend",
+    "build": "npm run install:all && npm run test",
+    "test": "cd backend && npm test",
+    "lint": "cd backend && npm run lint",
+    "migrate": "node scripts/migrate-v2.5.0.js",
+    "docker:build": "docker build -t strato-quantum-platform .",
+    "docker:dev": "docker-compose up -d",
+    "docker:prod": "docker-compose --profile production up -d",
+    "docker:monitor": "docker-compose --profile production --profile monitoring up -d",
+    "docker:down": "docker-compose down -v",
+    "docker:logs": "docker-compose logs -f app",
+    "setup": "npm run install:all && npm run migrate",
+    "clean": "docker system prune -a -f && npm run docker:down"
+  },
+  "keywords": [
+    "strato-quantum",
+    "platform",
+    "business-management",
+    "ai-agents",
+    "microservices",
+    "tailwind",
+    "docker"
+  ],
+  "author": "Strato Quantum Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stratoquantum/platform.git"
+  },
+  "bugs": {
+    "url": "https://github.com/stratoquantum/platform/issues"
+  },
+  "homepage": "https://stratoquantum.com",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "workspaces": [
+    "backend"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
