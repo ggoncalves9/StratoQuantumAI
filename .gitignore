@@ -26,15 +26,8 @@
 # ============================================
 # Scripts Temporários de Configuração
 # ============================================
-setup_git_config.sh
-fix_ssh_wsl.sh
-apply_ssh_config.sh
-git_commit.sh
-git_commit.bat
-configurar_ssh_wsl.bat
-WSL_SSH_CONFIG.md
-remove_tracked_sensitive_files.sh
-README_GIT_IGNORE.md
+# Diretório completo com scripts de manutenção Git/SSH
+maintenance_devops/
 
 # ============================================
 # Environment & Secrets
