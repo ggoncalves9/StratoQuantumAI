@@ -1,0 +1,202 @@
+# ============================================
+# Git Configuration & Sensitive Files
+# ============================================
+# Arquivos de configuração Git com dados sensíveis
+# NOTA: .git/config contém user.name e user.email locais
+#       que são específicos do ambiente - não deve ser commitado
+#       Mas como é necessário para o Git funcionar, mantenha localmente
+.git/config.local
+.git/config.backup*
+.git/config.old
+.git/config.work
+.git/credentials
+.git/worktrees/
+.git/refs/original/
+.git/hooks/*.sample
+.git/info/exclude
+
+# SSH Keys e configurações sensíveis
+.ssh/id_*
+.ssh/config.local
+.ssh/config.backup*
+.ssh/*.pem
+.ssh/*.key
+.ssh/known_hosts
+
+# ============================================
+# Scripts Temporários de Configuração
+# ============================================
+setup_git_config.sh
+fix_ssh_wsl.sh
+apply_ssh_config.sh
+git_commit.sh
+git_commit.bat
+configurar_ssh_wsl.bat
+WSL_SSH_CONFIG.md
+remove_tracked_sensitive_files.sh
+README_GIT_IGNORE.md
+
+# ============================================
+# Environment & Secrets
+# ============================================
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+*.env
+secrets/
+*.secret
+*.key
+*.pem
+*.p12
+*.jks
+credentials.json
+service-account.json
+
+# ============================================
+# Node.js / JavaScript
+# ============================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json.backup
+.npm
+.node_repl_history
+*.log
+
+# ============================================
+# Python
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+venv/
+ENV/
+env/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+*.pyc
+*.pyo
+*.pyd
+
+# ============================================
+# IDEs & Editors
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# ============================================
+# Logs & Databases
+# ============================================
+logs/
+*.log
+*.sql
+*.sqlite
+*.sqlite3
+*.db
+*.db3
+
+# ============================================
+# Docker
+# ============================================
+.dockerignore
+docker-compose.override.yml
+*.dockerignore
+
+# ============================================
+# AWS & Cloud
+# ============================================
+.aws/
+*.pem
+*.key
+aws-credentials.json
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+
+# ============================================
+# Temporary Files
+# ============================================
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*.swp
+*.swo
+*~
+.cache/
+
+# ============================================
+# Build & Distribution
+# ============================================
+build/
+dist/
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# ============================================
+# OS Specific
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ============================================
+# Project Specific
+# ============================================
+# Manter estrutura mas ignorar conteúdo sensível
+stratoquantum_environment/
+*.local.js
+*.local.json
+config.local.*
+settings.local.*
+
