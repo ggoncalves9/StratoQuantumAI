@@ -1,5 +1,6 @@
 // PostgreSQL Database connection utility for Strato Quantum Platform
 const { Pool } = require('pg');
+const config = require('../config');
 const logger = require('./logger');
 
 class Database {
@@ -11,15 +12,15 @@ class Database {
   async connect() {
     try {
       // Database configuration
-      const config = {
-        connectionString: process.env.DATABASE_URL,
-        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-        max: 20, // Maximum number of clients in the pool
+      const dbConfig = {
+        connectionString: config.getDatabaseUrl(),
+        ssl: config.database.ssl ? { rejectUnauthorized: false } : false,
+        max: config.database.poolSize, // Maximum number of clients in the pool
         idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
         connectionTimeoutMillis: 2000, // Return an error after 2 seconds if connection could not be established
       };
 
-      this.pool = new Pool(config);
+      this.pool = new Pool(dbConfig);
 
       // Test the connection
       const client = await this.pool.connect();

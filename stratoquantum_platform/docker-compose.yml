@@ -10,12 +10,20 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=production
-      - PORT=3000
-      - DATABASE_URL=postgresql://stratoquantum:stratoquantum2025@postgres:5432/stratoquantum
-      - REDIS_URL=redis://redis:6379
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${PLATFORM_PORT:-3000}
+      - HOST=${PLATFORM_HOST:-0.0.0.0}
+      - DATABASE_URL=postgresql://${DATABASE_USER:-stratoquantum}:${DATABASE_PASSWORD:-stratoquantum2025}@postgres:${DATABASE_PORT:-5432}/${DATABASE_NAME:-stratoquantum}
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-stratoquantum2025}@redis:${REDIS_PORT:-6379}/${REDIS_DB:-0}
       - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
-      - API_RATE_LIMIT=100
+      - SESSION_SECRET=${SESSION_SECRET:-your-session-secret-key}
+      - AGENTS_API_URL=${AGENTS_API_URL:-http://agents:8000}
+      - AGENTS_API_KEY=${AGENTS_API_KEY:-your-agents-api-key}
+      - RATE_LIMIT_REQUESTS=${RATE_LIMIT_REQUESTS:-100}
+      - RATE_LIMIT_WINDOW=${RATE_LIMIT_WINDOW:-60}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - ENABLE_METRICS=${ENABLE_METRICS:-true}
+      - SENTRY_DSN=${SENTRY_DSN}
     depends_on:
       postgres:
         condition: service_healthy
@@ -43,11 +51,17 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-      - PORT=3000
-      - DATABASE_URL=postgresql://stratoquantum:stratoquantum2025@postgres:5432/stratoquantum
-      - REDIS_URL=redis://redis:6379
-      - JWT_SECRET=dev-secret-key-change-in-production
-      - API_RATE_LIMIT=1000
+      - PORT=${PLATFORM_PORT:-3000}
+      - HOST=${PLATFORM_HOST:-0.0.0.0}
+      - DATABASE_URL=postgresql://${DATABASE_USER:-stratoquantum}:${DATABASE_PASSWORD:-stratoquantum2025}@postgres:${DATABASE_PORT:-5432}/${DATABASE_NAME:-stratoquantum}
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-stratoquantum2025}@redis:${REDIS_PORT:-6379}/${REDIS_DB:-0}
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-key-change-in-production}
+      - SESSION_SECRET=${SESSION_SECRET:-dev-session-secret}
+      - AGENTS_API_URL=${AGENTS_API_URL:-http://agents:8000}
+      - AGENTS_API_KEY=${AGENTS_API_KEY:-dev-agents-api-key}
+      - RATE_LIMIT_REQUESTS=${RATE_LIMIT_REQUESTS:-1000}
+      - DEBUG=true
+      - LOG_LEVEL=debug
     depends_on:
       postgres:
         condition: service_healthy
@@ -105,6 +119,50 @@ services:
       interval: 30s
       timeout: 3s
       retries: 5
+
+  # AI Agents Service
+  agents:
+    build:
+      context: ../stratoquantum_agents
+      dockerfile: Dockerfile
+    container_name: strato-quantum-agents
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DEBUG=${DEBUG:-false}
+      - HOST=${AGENTS_HOST:-0.0.0.0}
+      - PORT=${AGENTS_PORT:-8000}
+      - WORKERS=${AGENTS_WORKERS:-4}
+      - DATABASE_URL=postgresql://${DATABASE_USER:-stratoquantum}:${DATABASE_PASSWORD:-stratoquantum2025}@postgres:${DATABASE_PORT:-5432}/${DATABASE_NAME:-stratoquantum}
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-stratoquantum2025}@redis:${REDIS_PORT:-6379}/${REDIS_DB:-1}
+      - SECRET_KEY=${SECRET_KEY:-your-super-secret-key-change-in-production}
+      - API_KEY=${AGENTS_API_KEY:-your-agents-api-key}
+      - PLATFORM_API_URL=${PLATFORM_API_URL:-http://app:3000}
+      - PLATFORM_API_KEY=${PLATFORM_API_KEY:-your-platform-api-key}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - MODEL_PROVIDER=${MODEL_PROVIDER:-openai}
+      - DEFAULT_MODEL=${DEFAULT_MODEL:-gpt-4}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - ENABLE_METRICS=${ENABLE_METRICS:-true}
+      - SENTRY_DSN=${SENTRY_DSN}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - strato-network
+    restart: unless-stopped
+    volumes:
+      - agents-logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # Nginx Reverse Proxy (for production)
   nginx:
@@ -180,6 +238,8 @@ volumes:
     name: strato-quantum-redis-data
   app-logs:
     name: strato-quantum-app-logs
+  agents-logs:
+    name: strato-quantum-agents-logs
   nginx-logs:
     name: strato-quantum-nginx-logs
   prometheus-data:

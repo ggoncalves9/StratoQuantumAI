@@ -32,12 +32,68 @@ O objetivo é desenvolver um enxame de agentes que possam atuar dentro de empres
 O **StratoAI** visa fornecer um **ambiente inteligente e interconectado** para empresas, ajudando na **automações de processos, análise de dados, automação** para focar 
  a tomada de decisões para empresarios.
 
+## ⚙️ Configuração do Ambiente | Environment Setup
+
+### 🚀 Setup Rápido | Quick Setup
+
+**1. Clone o repositório:**
+```bash
+git clone https://github.com/your-username/StratoQuantumAI.git
+cd StratoQuantumAI
+```
+
+**2. Configure as variáveis de ambiente:**
+```bash
+# Windows
+scripts\setup-env.bat
+
+# Linux/macOS
+chmod +x scripts/setup-env.sh
+./scripts/setup-env.sh
+```
+
+**3. Instale as dependências:**
+```bash
+# Platform Backend
+cd stratoquantum_platform
+npm install
+
+# AI Agents
+cd ../stratoquantum_agents
+pip install -r requirements.txt
+```
+
+**4. Inicie os serviços:**
+```bash
+# Development mode
+npm run dev
+```
+
+### 📋 Variáveis de Ambiente Principais | Main Environment Variables
+
+```env
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/stratoquantum
+REDIS_URL=redis://localhost:6379
+
+# Security
+JWT_SECRET=your-super-secret-jwt-key
+API_KEY=your-agents-api-key
+
+# AI Models
+OPENAI_API_KEY=your-openai-api-key
+MODEL_PROVIDER=openai
+```
+
+📚 **Documentação completa:** [Environment Setup Guide](docs/ENVIRONMENT_SETUP.md)
+
 ## 🛠️ Como contribuir? | How to Contribute?
 
 1. Faça um **fork** deste repositório.  
-2. Crie um **branch** para suas alterações: `git checkout -b minha-contribuicao`.  
-3. Faça um **commit** das suas mudanças: `git commit -m "Adicionando nova funcionalidade"`  
-4. Envie um **pull request** para revisão.  
+2. Configure o ambiente seguindo o guia acima.
+3. Crie um **branch** para suas alterações: `git checkout -b minha-contribuicao`.  
+4. Faça um **commit** das suas mudanças: `git commit -m "Adicionando nova funcionalidade"`  
+5. Envie um **pull request** para revisão.  
 
 ## 📜 Licença | License
 

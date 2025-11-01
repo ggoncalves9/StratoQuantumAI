@@ -27,7 +27,8 @@
 # Scripts Temporários de Configuração
 # ============================================
 # Diretório completo com scripts de manutenção Git/SSH
-maintenance_devops/
+maintenance_devops/*
+scripts/*
 
 # ============================================
 # Environment & Secrets
@@ -37,7 +38,10 @@ maintenance_devops/
 .env.*.local
 .env.production
 .env.development
+.env.staging
+.env.test
 *.env
+!.env.example
 secrets/
 *.secret
 *.key
@@ -46,6 +50,8 @@ secrets/
 *.jks
 credentials.json
 service-account.json
+config.local.*
+settings.local.*
 
 # ============================================
 # Node.js / JavaScript
@@ -192,4 +198,5 @@ stratoquantum_environment/
 *.local.json
 config.local.*
 settings.local.*
+StratoQuantum_MasterPrompt.txt
 

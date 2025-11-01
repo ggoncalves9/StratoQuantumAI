@@ -1,0 +1,79 @@
+{
+  "name": "stratoquantum-ai",
+  "version": "2.6.8",
+  "description": "StratoQuantum AI - Open Source AI Agent Ecosystem for Enterprise Automation",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npm run docker:dev",
+    "start": "npm run docker:prod",
+    "setup": "npm run env:setup && npm run install:all",
+    "env:setup": "./scripts/setup-env.sh",
+    "env:validate": "node scripts/validate-env.js",
+    "install:all": "npm run install:platform && npm run install:agents",
+    "install:platform": "cd stratoquantum_platform && npm install",
+    "install:agents": "cd stratoquantum_agents && pip install -r requirements.txt",
+    "docker:build": "docker-compose -f stratoquantum_platform/docker-compose.yml build",
+    "docker:dev": "docker-compose -f stratoquantum_platform/docker-compose.yml --profile development up -d",
+    "docker:prod": "docker-compose -f stratoquantum_platform/docker-compose.yml --profile production up -d",
+    "docker:monitor": "docker-compose -f stratoquantum_platform/docker-compose.yml --profile production --profile monitoring up -d",
+    "docker:down": "docker-compose -f stratoquantum_platform/docker-compose.yml down -v",
+    "docker:logs": "docker-compose -f stratoquantum_platform/docker-compose.yml logs -f",
+    "docker:logs:app": "docker-compose -f stratoquantum_platform/docker-compose.yml logs -f app",
+    "docker:logs:agents": "docker-compose -f stratoquantum_platform/docker-compose.yml logs -f agents",
+    "health:check": "curl -f http://localhost:3000/health && curl -f http://localhost:8000/health",
+    "health:platform": "curl -f http://localhost:3000/health",
+    "health:agents": "curl -f http://localhost:8000/health",
+    "test": "npm run test:platform && npm run test:agents",
+    "test:platform": "cd stratoquantum_platform && npm test",
+    "test:agents": "cd stratoquantum_agents && python -m pytest",
+    "lint": "npm run lint:platform && npm run lint:agents",
+    "lint:platform": "cd stratoquantum_platform && npm run lint",
+    "lint:agents": "cd stratoquantum_agents && flake8 .",
+    "clean": "npm run docker:down && docker system prune -f",
+    "clean:all": "npm run docker:down && docker system prune -a -f",
+    "backup:env": "cp .env .env.backup.$(date +%Y%m%d_%H%M%S) && cp stratoquantum_platform/.env stratoquantum_platform/.env.backup.$(date +%Y%m%d_%H%M%S) && cp stratoquantum_agents/.env stratoquantum_agents/.env.backup.$(date +%Y%m%d_%H%M%S)",
+    "init": "chmod +x scripts/*.sh && ./scripts/init-project.sh"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "crewai",
+    "enterprise",
+    "automation",
+    "kubernetes",
+    "microservices",
+    "business-management",
+    "open-source"
+  ],
+  "author": "StratoQuantum Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stratoquantum/StratoQuantumAI.git"
+  },
+  "bugs": {
+    "url": "https://github.com/stratoquantum/StratoQuantumAI/issues"
+  },
+  "homepage": "https://stratoquantum.com",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0",
+    "python": ">=3.8.0"
+  },
+  "workspaces": [
+    "stratoquantum_platform",
+    "stratoquantum_agents"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "config": {
+    "platform_port": 3000,
+    "agents_port": 8000,
+    "docker_compose_file": "stratoquantum_platform/docker-compose.yml"
+  }
+}

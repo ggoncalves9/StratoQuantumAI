@@ -1,9 +1,11 @@
-// Strato Quantum Platform - Backend Server v2.5.0
+// Strato Quantum Platform - Backend Server v2.6.8
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
-require('dotenv').config();
+
+// Import configuration
+const config = require('./config');
 
 const logger = require('./utils/logger');
 const database = require('./utils/database');
@@ -17,7 +19,6 @@ const agentRoutes = require('./routes/agents');
 const analyticsRoutes = require('./routes/analytics');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Security middleware
 app.use(helmet({
@@ -34,10 +35,9 @@ app.use(helmet({
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://stratoquantum.com', 'https://app.stratoquantum.com']
-    : ['http://localhost:3000', 'http://localhost:8080', 'http://127.0.0.1:5500'],
-  credentials: true
+  origin: config.getCorsOrigins(),
+  methods: config.cors.methods,
+  credentials: config.cors.credentials
 }));
 
 // Rate limiting
@@ -48,7 +48,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Static files (serve frontend in production)
-if (process.env.NODE_ENV === 'production') {
+if (config.isProduction()) {
   app.use(express.static(path.join(__dirname, '../../frontend')));
 }
 
@@ -59,13 +59,18 @@ app.get('/health', async (req, res) => {
   
   res.json({
     status: dbHealth ? 'OK' : 'DEGRADED',
-    version: '2.6.0',
+    name: config.app.name,
+    version: config.app.version,
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    environment: process.env.NODE_ENV || 'development',
+    environment: config.app.env,
     database: {
       connected: dbHealth,
       ...dbInfo
+    },
+    agents: {
+      url: config.agents.apiUrl,
+      connected: false // TODO: Add agents health check
     }
   });
 });
@@ -79,9 +84,10 @@ app.use('/api/analytics', analyticsRoutes);
 // API documentation endpoint
 app.get('/api', (req, res) => {
   res.json({
-    name: 'Strato Quantum Platform API',
-    version: '2.5.0',
-    description: 'Backend API for Strato Quantum Platform',
+    name: config.app.name + ' API',
+    version: config.app.version,
+    description: 'Backend API for StratoQuantum Platform',
+    environment: config.app.env,
     endpoints: {
       auth: '/api/auth',
       workspaces: '/api/workspaces',
@@ -89,12 +95,13 @@ app.get('/api', (req, res) => {
       analytics: '/api/analytics'
     },
     documentation: '/api/docs',
-    health: '/health'
+    health: '/health',
+    websocket: config.websocket.enabled ? `ws://localhost:${config.websocket.port}` : null
   });
 });
 
 // Serve frontend in production
-if (process.env.NODE_ENV === 'production') {
+if (config.isProduction()) {
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../../frontend/index.html'));
   });
@@ -118,16 +125,27 @@ process.on('SIGINT', () => {
 // Initialize database and start server
 async function startServer() {
   try {
+    // Validate configuration
+    config.validate();
+    
     // Connect to database
     await database.connect();
     
     // Start server
-    app.listen(PORT, () => {
-      logger.info(`🚀 Strato Quantum Backend v2.6.0 running on port ${PORT}`);
-      logger.info(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+    app.listen(config.app.port, config.app.host, () => {
+      logger.info(`🚀 ${config.app.name} v${config.app.version} running on ${config.app.url}`);
+      logger.info(`📊 Environment: ${config.app.env}`);
       logger.info(`🗄️  Database: PostgreSQL connected`);
-      logger.info(`🔗 Health check: http://localhost:${PORT}/health`);
-      logger.info(`📚 API docs: http://localhost:${PORT}/api`);
+      logger.info(`🔗 Health check: ${config.app.url}/health`);
+      logger.info(`📚 API docs: ${config.app.url}/api`);
+      
+      if (config.websocket.enabled) {
+        logger.info(`🔌 WebSocket: ws://localhost:${config.websocket.port}`);
+      }
+      
+      if (config.agents.apiUrl) {
+        logger.info(`🤖 AI Agents: ${config.agents.apiUrl}`);
+      }
     });
   } catch (error) {
     logger.error('Failed to start server:', error);

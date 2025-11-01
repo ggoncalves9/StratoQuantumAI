@@ -7,15 +7,18 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Copy package files
-COPY backend/package*.json ./
+COPY package*.json ./
+COPY backend/package*.json ./backend/
 RUN npm ci --only=production && npm cache clean --force
 
 # Development stage
 FROM base AS dev
 WORKDIR /app
-COPY backend/package*.json ./
+COPY package*.json ./
+COPY backend/package*.json ./backend/
 RUN npm ci
-COPY backend/ ./
+COPY backend/ ./backend/
+WORKDIR /app/backend
 EXPOSE 3000
 CMD ["npm", "run", "dev"]
 
