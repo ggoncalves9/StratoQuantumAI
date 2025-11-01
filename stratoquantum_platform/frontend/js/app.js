@@ -8,6 +8,8 @@ class StratoQuantumApp {
     this.agents = this.initializeAgents();
     this.teamData = this.initializeTeamData();
     this.agentsBarCollapsed = false;
+    this.leftSidebarHidden = false;
+    this.rightSidebarHidden = false;
     this.init();
   }
 
@@ -279,18 +281,38 @@ class StratoQuantumApp {
     this.renderTeamMembers();
     this.bindEvents();
     this.loadStoredTheme();
+    this.loadSidebarPreferences();
     this.initializeDraggableAgentsBar();
+    this.animateToolbarEntrance();
+  }
+
+  animateToolbarEntrance() {
+    // Add entrance animation to the toolbar
+    const toolbar = document.getElementById('floatingAgentsBar');
+    if (toolbar) {
+      toolbar.classList.add('animate-slide-up');
+      
+      // Add staggered animation to agent buttons
+      setTimeout(() => {
+        const agentButtons = toolbar.querySelectorAll('.agent-btn');
+        agentButtons.forEach((btn, index) => {
+          setTimeout(() => {
+            btn.classList.add('animate-bounce-in');
+          }, index * 100);
+        });
+      }, 300);
+    }
   }
 
   renderNavigation() {
     const nav = document.getElementById('workspaceNav');
     nav.innerHTML = this.workspaces.map(workspace => `
-      <div class="workspace-item cursor-pointer p-3 rounded-lg border border-transparent hover:border-quantum-400/30 hover:bg-quantum-400/5 transition-all"
+      <div class="workspace-item cursor-pointer p-2 rounded-lg border border-transparent hover:border-quantum-400/30 hover:bg-quantum-400/5 transition-all"
            data-workspace="${workspace.id}">
-        <div class="flex items-center space-x-3">
-          <span class="text-xl">${workspace.icon}</span>
-          <div>
-            <div class="font-medium text-sm">${workspace.name}</div>
+        <div class="flex items-center space-x-2">
+          <span class="text-lg">${workspace.icon}</span>
+          <div class="flex-1 min-w-0">
+            <div class="font-medium text-sm truncate">${workspace.name}</div>
             <div class="text-xs text-gray-400">${workspace.modules.length} módulos</div>
           </div>
         </div>
@@ -318,20 +340,19 @@ class StratoQuantumApp {
     const personas = Object.entries(this.teamData.personas).filter(([id]) => id !== 'hustle');
     
     teamList.innerHTML = personas.map(([id, persona]) => `
-      <div class="team-member cursor-pointer p-3 rounded-lg border border-transparent hover:border-quantum-400/30 hover:bg-quantum-400/5 transition-all"
+      <div class="team-member cursor-pointer p-2 rounded-lg border border-transparent hover:border-quantum-400/30 hover:bg-quantum-400/5 transition-all"
            data-member="${id}">
-        <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-2">
           <div class="relative">
-            <span class="text-2xl">${persona.avatar}</span>
-            <div class="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-dark-900"></div>
+            <span class="text-lg">${persona.avatar}</span>
+            <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-dark-900"></div>
           </div>
           <div class="flex-1 min-w-0">
             <h4 class="font-medium text-sm truncate">${persona.name}</h4>
             <p class="text-xs text-gray-400 truncate">${persona.role}</p>
           </div>
-          <div class="flex flex-col items-end">
-            <div class="w-2 h-2 bg-green-400 rounded-full"></div>
-            <span class="text-xs text-gray-500 mt-1">${persona.lastSeen}</span>
+          <div class="flex items-center">
+            <div class="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
           </div>
         </div>
       </div>
@@ -743,6 +764,7 @@ class StratoQuantumApp {
       startTop = rect.top;
       
       toolbar.style.cursor = 'grabbing';
+      toolbar.classList.add('scale-105', 'shadow-2xl');
       e.preventDefault();
     });
 
@@ -755,12 +777,21 @@ class StratoQuantumApp {
       const newLeft = startLeft + deltaX;
       const newTop = startTop + deltaY;
       
-      // Keep within viewport bounds
-      const maxLeft = window.innerWidth - toolbar.offsetWidth - 20;
-      const maxTop = window.innerHeight - toolbar.offsetHeight - 20;
+      // Keep within viewport bounds - adjusted for horizontal toolbar
+      const toolbarWidth = toolbar.offsetWidth;
+      const toolbarHeight = toolbar.offsetHeight;
+      const maxLeft = window.innerWidth - toolbarWidth - 20;
+      const maxTop = window.innerHeight - toolbarHeight - 20;
+      const minLeft = 20;
+      const minTop = 20;
       
-      container.style.left = Math.max(20, Math.min(newLeft, maxLeft)) + 'px';
-      container.style.top = Math.max(20, Math.min(newTop, maxTop)) + 'px';
+      // Constrain movement
+      const constrainedLeft = Math.max(minLeft, Math.min(newLeft, maxLeft));
+      const constrainedTop = Math.max(minTop, Math.min(newTop, maxTop));
+      
+      container.style.left = constrainedLeft + 'px';
+      container.style.bottom = 'auto';
+      container.style.top = constrainedTop + 'px';
       container.style.transform = 'none';
     });
 
@@ -768,6 +799,53 @@ class StratoQuantumApp {
       if (isDragging) {
         isDragging = false;
         toolbar.style.cursor = 'move';
+        toolbar.classList.remove('scale-105', 'shadow-2xl');
+      }
+    });
+
+    // Add touch support for mobile
+    toolbar.addEventListener('touchstart', (e) => {
+      if (e.target.closest('.agent-btn') || e.target.closest('#toggleAgentsBar')) return;
+      
+      const touch = e.touches[0];
+      isDragging = true;
+      startX = touch.clientX;
+      startY = touch.clientY;
+      
+      const rect = container.getBoundingClientRect();
+      startLeft = rect.left;
+      startTop = rect.top;
+      
+      e.preventDefault();
+    });
+
+    document.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - startX;
+      const deltaY = touch.clientY - startY;
+      
+      const newLeft = startLeft + deltaX;
+      const newTop = startTop + deltaY;
+      
+      // Keep within viewport bounds
+      const toolbarWidth = toolbar.offsetWidth;
+      const toolbarHeight = toolbar.offsetHeight;
+      const maxLeft = window.innerWidth - toolbarWidth - 20;
+      const maxTop = window.innerHeight - toolbarHeight - 20;
+      
+      container.style.left = Math.max(20, Math.min(newLeft, maxLeft)) + 'px';
+      container.style.bottom = 'auto';
+      container.style.top = Math.max(20, Math.min(newTop, maxTop)) + 'px';
+      container.style.transform = 'none';
+      
+      e.preventDefault();
+    });
+
+    document.addEventListener('touchend', () => {
+      if (isDragging) {
+        isDragging = false;
       }
     });
   }
@@ -778,21 +856,122 @@ class StratoQuantumApp {
     
     this.agentsBarCollapsed = !this.agentsBarCollapsed;
     
+    const toolbar = document.getElementById('agentsToolbar');
+    
     if (this.agentsBarCollapsed) {
+      // Hide agents list for horizontal layout
       agentsList.style.display = 'none';
+      toolbar.classList.add('opacity-75', 'scale-95');
       toggleBtn.innerHTML = `
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+        <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7-7-7 7"></path>
         </svg>
       `;
     } else {
-      agentsList.style.display = 'block';
+      // Show agents list in horizontal layout
+      agentsList.style.display = 'flex';
+      toolbar.classList.remove('opacity-75', 'scale-95');
       toggleBtn.innerHTML = `
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7 7 7-7"></path>
         </svg>
       `;
     }
+  }
+
+  // Sidebar Control Functions
+  toggleLeftSidebar() {
+    this.leftSidebarHidden = !this.leftSidebarHidden;
+    this.updateLayoutClasses();
+    
+    const leftSidebar = document.getElementById('leftSidebar');
+    const showBtn = document.getElementById('showLeftSidebar');
+    
+    if (this.leftSidebarHidden) {
+      leftSidebar.style.display = 'none';
+      showBtn.classList.remove('hidden');
+    } else {
+      leftSidebar.style.display = 'block';
+      showBtn.classList.add('hidden');
+    }
+    
+    // Store preference
+    localStorage.setItem('sq_left_sidebar_hidden', this.leftSidebarHidden);
+  }
+
+  toggleRightSidebar() {
+    this.rightSidebarHidden = !this.rightSidebarHidden;
+    this.updateLayoutClasses();
+    
+    const rightSidebar = document.getElementById('rightSidebar');
+    const showBtn = document.getElementById('showRightSidebar');
+    
+    if (this.rightSidebarHidden) {
+      rightSidebar.style.display = 'none';
+      showBtn.classList.remove('hidden');
+    } else {
+      rightSidebar.style.display = 'block';
+      showBtn.classList.add('hidden');
+    }
+    
+    // Store preference
+    localStorage.setItem('sq_right_sidebar_hidden', this.rightSidebarHidden);
+  }
+
+  showLeftSidebar() {
+    this.leftSidebarHidden = false;
+    this.updateLayoutClasses();
+    
+    document.getElementById('leftSidebar').style.display = 'block';
+    document.getElementById('showLeftSidebar').classList.add('hidden');
+    
+    localStorage.setItem('sq_left_sidebar_hidden', false);
+  }
+
+  showRightSidebar() {
+    this.rightSidebarHidden = false;
+    this.updateLayoutClasses();
+    
+    document.getElementById('rightSidebar').style.display = 'block';
+    document.getElementById('showRightSidebar').classList.add('hidden');
+    
+    localStorage.setItem('sq_right_sidebar_hidden', false);
+  }
+
+  updateLayoutClasses() {
+    const mainLayout = document.getElementById('mainLayout');
+    
+    // Remove all layout classes
+    mainLayout.classList.remove('sidebar-hidden-left', 'sidebar-hidden-right', 'sidebar-hidden-both');
+    
+    // Apply appropriate class based on sidebar states
+    if (this.leftSidebarHidden && this.rightSidebarHidden) {
+      mainLayout.classList.add('sidebar-hidden-both');
+    } else if (this.leftSidebarHidden) {
+      mainLayout.classList.add('sidebar-hidden-left');
+    } else if (this.rightSidebarHidden) {
+      mainLayout.classList.add('sidebar-hidden-right');
+    }
+  }
+
+  loadSidebarPreferences() {
+    // Load stored preferences
+    const leftHidden = localStorage.getItem('sq_left_sidebar_hidden') === 'true';
+    const rightHidden = localStorage.getItem('sq_right_sidebar_hidden') === 'true';
+    
+    if (leftHidden) {
+      this.leftSidebarHidden = true;
+      document.getElementById('leftSidebar').style.display = 'none';
+      document.getElementById('showLeftSidebar').classList.remove('hidden');
+    }
+    
+    if (rightHidden) {
+      this.rightSidebarHidden = true;
+      document.getElementById('rightSidebar').style.display = 'none';
+      document.getElementById('showRightSidebar').classList.remove('hidden');
+    }
+    
+    this.updateLayoutClasses();
   }
 
   applyTheme(theme) {
@@ -875,6 +1054,23 @@ class StratoQuantumApp {
     // Agents Bar Toggle
     document.getElementById('toggleAgentsBar').addEventListener('click', () => {
       this.toggleAgentsBar();
+    });
+
+    // Sidebar Toggle Events
+    document.getElementById('toggleLeftSidebar').addEventListener('click', () => {
+      this.toggleLeftSidebar();
+    });
+
+    document.getElementById('toggleRightSidebar').addEventListener('click', () => {
+      this.toggleRightSidebar();
+    });
+
+    document.getElementById('showLeftSidebar').addEventListener('click', () => {
+      this.showLeftSidebar();
+    });
+
+    document.getElementById('showRightSidebar').addEventListener('click', () => {
+      this.showRightSidebar();
     });
 
     // Theme events

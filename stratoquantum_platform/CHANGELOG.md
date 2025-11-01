@@ -1,5 +1,38 @@
 # Changelog - Strato Quantum Platform
 
+## [v2.6.8] - 2025-01-11
+
+### 🎨 UI/UX Improvements - Workspace Focus
+- **NEW**: Sidebar width optimization for better workspace focus
+- **NEW**: Hide/show buttons for left navigation and right chat
+- **NEW**: Improved responsive layout with more central space
+- **IMPROVED**: Better workspace content visibility and usability
+
+### 📱 Layout Enhancements
+- **NEW**: Collapsible left navigation menu
+- **NEW**: Collapsible right team chat sidebar
+- **IMPROVED**: Optimized sidebar widths for better content focus
+- **IMPROVED**: Smooth animations for sidebar toggle
+
+---
+
+## [v2.6.7] - 2025-01-11
+
+### 🤖 AI Agents Toolbar - Horizontal Layout
+- **NEW**: Horizontal AI agents toolbar at bottom center
+- **NEW**: Drag & drop functionality with touch support
+- **NEW**: Smooth entrance animations with staggered agent buttons
+- **NEW**: Collapsible toolbar with visual feedback
+- **IMPROVED**: Better mobile responsiveness for agents toolbar
+
+### ✨ Visual Enhancements
+- **NEW**: Glassmorphism effects with backdrop blur
+- **NEW**: Gradient shadows and hover animations
+- **NEW**: Tooltip support for better UX
+- **IMPROVED**: Transition animations throughout the interface
+
+---
+
 ## [v2.6.3] - 2025-01-11
 
 ### 🤖 AI Agents Core - AWS Ready

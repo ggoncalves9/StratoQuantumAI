@@ -1,6 +1,6 @@
 {
   "name": "strato-quantum-backend",
-  "version": "2.6.0",
+  "version": "2.6.8",
   "description": "Strato Quantum Platform - Backend API",
   "main": "src/server.js",
   "scripts": {

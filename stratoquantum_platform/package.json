@@ -1,6 +1,6 @@
 {
   "name": "strato-quantum-platform",
-  "version": "2.6.0",
+  "version": "2.6.8",
   "description": "Strato Quantum Platform - Modern Business Management with AI Agents",
   "main": "backend/src/server.js",
   "scripts": {
